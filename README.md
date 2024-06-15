@@ -16,7 +16,7 @@ The Pomodoro Timer is a productivity tool that helps you manage your work sessio
 
 ## Screenshots
 
-![Pomodoro Timer Screenshot]((https://github.com/Quantumx610/my_pomodoro_timer/assets/137670917/494a52fb-d36f-4a75-8107-fd53da92e559))
+![Pomodoro Timer Screenshot](image.png)
 
 ## Installation
 

@@ -61,8 +61,5 @@ We welcome contributions! Here’s how you can help:
 
 ## Contact
 
-If you have any questions or suggestions, feel free to open an issue or contact me at your-email@example.com.
+If you have any questions or suggestions, feel free to open an issue or contact me at rajatsoni1345@gmail.com.
 
----
-
-You can customize this README with more details or images as needed.

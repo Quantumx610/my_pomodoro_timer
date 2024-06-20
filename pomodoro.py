@@ -1,116 +1,202 @@
+import tkinter as tk
+from tkinter import messagebox, filedialog
+from plyer import notification
 import pygame
-import os
-from time import sleep
 import pyttsx3
+import os
 
-checkmark = 0
-total_mins = 0
+class PomodoroTimer:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Pomodoro Timer")
+        self.root.geometry("800x600")  # Increased window size for higher resolution
+        self.root.config(bg="#2E3440")
 
-# Initialize pygame
-pygame.init()
+        self.checkmark = 0
+        self.total_work_time = 0
+        self.total_break_time = 0
+        self.pomodoro_count = 0
+        self.running = False
+        self.paused = False
+        self.remaining_time = 0
 
-# Set up a minimal display (1x1 pixels)
-pygame.display.set_mode((1, 1))
+        # Initialize pygame mixer
+        pygame.mixer.init()
 
-# Initialize pygame mixer for audio
-pygame.mixer.init()
+        # Initialize pyttsx3
+        self.engine = pyttsx3.init()
 
-# Hardcoded path to the directory containing the music files
-music_directory = "E:\pomodoro\music"
+        # Task Label and Entry
+        self.task_label = tk.Label(root, text="Task:", font=("Helvetica", 14), bg="#2E3440", fg="#D8DEE9")
+        self.task_label.pack(pady=(30, 10))
+        self.task_entry = tk.Entry(root, width=50, font=("Helvetica", 14), bg="#4C566A", fg="#D8DEE9", insertbackground="#D8DEE9")
+        self.task_entry.pack(pady=(0, 20))
 
-# Initialize pyttsx3 for text-to-speech
-engine = pyttsx3.init()
+        # Button to Set Task
+        self.set_task_button = tk.Button(root, text="Set Task", command=self.set_task, font=("Helvetica", 14), bg="#A3BE8C", fg="#2E3440")
+        self.set_task_button.pack(pady=(0, 20))
 
-def tasks(task):
-    global checkmark
-    global total_mins
-    mins = 0
-    focus_time = 25
-    print('Timer for',task,'is',focus_time,'mins.')
-    while mins < focus_time:
-        sleep(60)
-        mins += 1
-        total_mins += 1
-        print(mins,"minutes work completed.")
-    checkmark += 1
-    print('Total cycles of pomodoro completed:', checkmark)
+        # Current Task Display
+        self.current_task_label = tk.Label(root, text="", font=("Helvetica", 14), bg="#2E3440", fg="#D8DEE9")
+        self.current_task_label.pack(pady=(0, 20))
 
-def load_music_files(directory):
-    music_files = []
-    for file in os.listdir(directory):
-        if file.endswith(".mp3") or file.endswith(".wav") or file.endswith(".opus") or file.endswith(".m4a"):
-            music_files.append(os.path.join(directory, file))
-    return music_files
+        # Timer Label
+        self.timer_label = tk.Label(root, text="25:00", font=("Helvetica", 72), bg="#2E3440", fg="#D8DEE9")
+        self.timer_label.pack(pady=20)
 
-def select_music(available_music_files):
-    print("Available music files:")
-    for idx, file in enumerate(available_music_files):
-        print(f"{idx + 1}. {os.path.basename(file)}")
+        # Control Buttons
+        self.button_frame = tk.Frame(root, bg="#2E3440")
+        self.button_frame.pack(pady=20)
 
-    while True:
-        try:
-            selection = int(input("Enter the number corresponding to the music file you want to play: "))
-            if 1 <= selection <= len(available_music_files):
-                return available_music_files[selection - 1]
+        self.start_button = tk.Button(self.button_frame, text="Start", command=self.start_timer, font=("Helvetica", 14), bg="#88C0D0", fg="#2E3440", width=10)
+        self.start_button.grid(row=0, column=0, padx=15)
+        self.pause_button = tk.Button(self.button_frame, text="Pause", command=self.pause_timer, font=("Helvetica", 14), bg="#EBCB8B", fg="#2E3440", width=10)
+        self.pause_button.grid(row=0, column=1, padx=15)
+        self.stop_button = tk.Button(self.button_frame, text="Stop", command=self.stop_timer, font=("Helvetica", 14), bg="#BF616A", fg="#2E3440", width=10)
+        self.stop_button.grid(row=0, column=2, padx=15)
+        self.reset_button = tk.Button(self.button_frame, text="Reset", command=self.reset_timer, font=("Helvetica", 14), bg="#5E81AC", fg="#2E3440", width=10)
+        self.reset_button.grid(row=0, column=3, padx=15)
+
+        # Music Selection Button
+        self.music_button = tk.Button(root, text="Select Music", command=self.load_music, font=("Helvetica", 14), bg="#A3BE8C", fg="#2E3440")
+        self.music_button.pack(pady=30)
+
+        # Custom Time Inputs
+        self.custom_time_frame = tk.Frame(root, bg="#2E3440")
+        self.custom_time_frame.pack(pady=10)
+
+        self.work_time_label = tk.Label(self.custom_time_frame, text="Work Duration (min):", font=("Helvetica", 12), bg="#2E3440", fg="#D8DEE9")
+        self.work_time_label.grid(row=0, column=0, padx=5)
+        self.work_time_entry = tk.Entry(self.custom_time_frame, width=5, font=("Helvetica", 12), bg="#4C566A", fg="#D8DEE9", insertbackground="#D8DEE9")
+        self.work_time_entry.grid(row=0, column=1, padx=5)
+        self.work_time_entry.insert(0, "25")
+
+        self.break_time_label = tk.Label(self.custom_time_frame, text="Break Duration (min):", font=("Helvetica", 12), bg="#2E3440", fg="#D8DEE9")
+        self.break_time_label.grid(row=0, column=2, padx=5)
+        self.break_time_entry = tk.Entry(self.custom_time_frame, width=5, font=("Helvetica", 12), bg="#4C566A", fg="#D8DEE9", insertbackground="#D8DEE9")
+        self.break_time_entry.grid(row=0, column=3, padx=5)
+        self.break_time_entry.insert(0, "5")
+
+        # Statistics
+        self.stats_label = tk.Label(root, text="Pomodoros Completed: 0\nTotal Work Time: 0 mins\nTotal Break Time: 0 mins", font=("Helvetica", 12), bg="#2E3440", fg="#D8DEE9")
+        self.stats_label.pack(pady=10)
+
+        # Initial music file
+        self.music_file = None
+
+    def set_task(self):
+        self.task = self.task_entry.get()
+        self.task_entry.config(state='disabled')
+        self.set_task_button.config(state='disabled')
+        self.current_task_label.config(text=f"Current Task: {self.task}")
+
+    def start_timer(self):
+        if not self.running and not self.paused and self.task_entry.get() != "":
+            self.running = True
+            self.work_duration = int(self.work_time_entry.get()) * 60
+            self.break_duration = int(self.break_time_entry.get()) * 60
+            self.countdown(self.work_duration)
+        elif self.paused:
+            self.running = True
+            self.paused = False
+            self.countdown(self.remaining_time)
+        elif not self.running:
+            messagebox.showwarning("Warning", "Please set a task before starting the timer.")
+
+    def pause_timer(self):
+        if self.running:
+            self.running = False
+            self.paused = True
+
+    def stop_timer(self):
+        self.running = False
+        self.paused = False
+        self.timer_label.config(text="25:00")
+
+    def reset_timer(self):
+        self.running = False
+        self.paused = False
+        self.timer_label.config(text="25:00")
+        self.task_entry.config(state='normal')
+        self.set_task_button.config(state='normal')
+        self.current_task_label.config(text="")
+        self.update_stats(0, 0, 0, 0, True)
+
+    def countdown(self, count):
+        mins, secs = divmod(count, 60)
+        time_format = '{:02d}:{:02d}'.format(mins, secs)
+        self.timer_label.config(text=time_format)
+        self.remaining_time = count
+
+        if self.running:
+            if count > 0:
+                self.root.after(1000, self.countdown, count-1)
             else:
-                print("Invalid selection. Please enter a number within the range.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
+                self.complete_task()
 
-def breaks(selected_music_file):
-    global checkmark
-    mins = 0
-    pygame.mixer.music.load(selected_music_file)
-    pygame.mixer.music.play(loops=-1)  # Play the music on loop
-    
-    # Set an event for music end
-    MUSIC_END = pygame.USEREVENT + 1
-    pygame.mixer.music.set_endevent(MUSIC_END)
+    def complete_task(self):
+        self.checkmark += 1
+        self.total_work_time += int(self.work_time_entry.get())
+        self.pomodoro_count += 1
+        self.engine.say(f"Task {self.task} completed. Take a break.")
+        self.engine.runAndWait()
+        notification.notify(
+            title="Pomodoro Timer",
+            message="Work session completed. Time for a break!",
+            timeout=5
+        )
+        self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count, 0)
+        self.start_break()
 
-    if checkmark < 6:
-        print('Take a short break.')
-        while mins < 5:
-            sleep(60)
-            mins += 1
-            print(mins,"minutes break completed.")
-            
-            # Check if the music end event is triggered
-            for event in pygame.event.get():
-                if event.type == MUSIC_END:
-                    pygame.mixer.music.play(loops=-1)  # Play the music again if it ends
-        print('Break over')
-    elif checkmark >= 6:
-        print('Take a long break.')
-        while mins < 15:
-            sleep(60)
-            mins += 1
-            print(mins, " minutes break completed.")
-            
-            # Check if the music end event is triggered
-            for event in pygame.event.get():
-                if event.type == MUSIC_END:
-                    pygame.mixer.music.play(loops=-1)  # Play the music again if it ends
-        checkmark = 0
-        print('Your long Break is over.')
-        
-    pygame.mixer.music.stop()
-    engine.say('Your break has been ended. Start focusing.')
-    engine.runAndWait()
+    def start_break(self):
+        if self.music_file:
+            pygame.mixer.music.load(self.music_file)
+            pygame.mixer.music.play(loops=-1)
 
-def main():
-    global total_mins
-    engine.say('Welcome to my Pomodoro Timer. What task do you want to work on?')
-    engine.runAndWait()
-    task = input('Welcome to Pomodoro Timer\nWhat task do you want to work on? ')
+        self.countdown_break(self.break_duration)
 
-    available_music_files = load_music_files(music_directory)
-    selected_music_file = select_music(available_music_files)
-    
-    while checkmark<7:
-        tasks(task)
-        breaks(selected_music_file)
+    def countdown_break(self, count):
+        mins, secs = divmod(count, 60)
+        time_format = '{:02d}:{:02d}'.format(mins, secs)
+        self.timer_label.config(text=time_format)
+        self.remaining_time = count
 
-    print(f"End of task {task}.\nTotal time worked was {total_mins} minutes.")
+        if self.running:
+            if count > 0:
+                self.root.after(1000, self.countdown_break, count-1)
+            else:
+                self.end_break()
 
-if __name__ == '__main__':
-    main()
+    def end_break(self):
+        self.stop_music()
+        self.total_break_time += int(self.break_time_entry.get())
+        self.engine.say("Break is over. Start focusing.")
+        self.engine.runAndWait()
+        notification.notify(
+            title="Pomodoro Timer",
+            message="Break is over. Time to focus!",
+            timeout=5
+        )
+        self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count, 0)
+        self.running = False
+        self.start_timer()  # Automatically start the next work session
+
+    def load_music(self):
+        self.music_file = filedialog.askopenfilename(filetypes=[("Audio Files", "*.mp3 *.wav")])
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
+
+    def update_stats(self, work_time, break_time, pomodoros, completed, reset=False):
+        if reset:
+            self.total_work_time = 0
+            self.total_break_time = 0
+            self.pomodoro_count = 0
+        stats_text = f"Pomodoros Completed: {self.pomodoro_count}\nTotal Work Time: {self.total_work_time} mins\nTotal Break Time: {self.total_break_time} mins"
+        self.stats_label.config(text=stats_text)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PomodoroTimer(root)
+    root.mainloop()
+

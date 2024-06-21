@@ -9,7 +9,7 @@ class PomodoroTimer:
     def __init__(self, root):
         self.root = root
         self.root.title("Pomodoro Timer")
-        self.root.geometry("800x600")  # Increased window size for higher resolution
+        self.root.geometry("800x700")  # Increased window size for higher resolution
         self.root.config(bg="#2E3440")
 
         self.checkmark = 0
@@ -38,7 +38,7 @@ class PomodoroTimer:
 
         # Current Task Display
         self.current_task_label = tk.Label(root, text="", font=("Helvetica", 14), bg="#2E3440", fg="#D8DEE9")
-        self.current_task_label.pack(pady=(0, 20))
+        self.current_task_label.pack(pady=(0, 5))
 
         # Timer Label
         self.timer_label = tk.Label(root, text="25:00", font=("Helvetica", 72), bg="#2E3440", fg="#D8DEE9")
@@ -80,6 +80,10 @@ class PomodoroTimer:
         # Statistics
         self.stats_label = tk.Label(root, text="Pomodoros Completed: 0\nTotal Work Time: 0 mins\nTotal Break Time: 0 mins", font=("Helvetica", 12), bg="#2E3440", fg="#D8DEE9")
         self.stats_label.pack(pady=10)
+
+        # Custom Message Label
+        self.custom_message_label = tk.Label(root, text="Made with ❤️by Rajat!", font=("Helvetica", 10), bg="#2E3440", fg="#D8DEE9")
+        self.custom_message_label.pack(pady=10)
 
         # Initial music file
         self.music_file = None

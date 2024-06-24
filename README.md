@@ -19,20 +19,8 @@ The Pomodoro Timer is a productivity tool that helps you manage your work sessio
 
 ## Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/pomodoro-timer.git
-   cd pomodoro-timer
    ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install pygame pyttsx3
-   ```
-
-3. **Run the application:**
-   ```bash
-   python pomodoro.py
+Download and run the pomodoro.exe located in dist folder
    ```
 
 ## Usage

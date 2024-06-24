@@ -20,7 +20,7 @@ The Pomodoro Timer is a productivity tool that helps you manage your work sessio
 ## Installation
 
    ```
-Download and run the pomodoro.exe located in dist folder
+Download and run the PomodoroTimer.exe located in dist folder
    ```
 
 ## Usage

@@ -8,8 +8,8 @@ class PomodoroTimer:
     def __init__(self, root):
         self.root = root
         self.root.title("Pomodoro Timer")
-        self.root.geometry("900x650")  # Increased window size for higher resolution
-        self.root.config(bg="#1E1E2E")  # Background color
+        self.root.geometry("600x610")  # Increased window size for higher resolution
+        self.root.config(bg="#1E1E1E")  # Dark background to match Windows 11
 
         self.checkmark = 0
         self.total_work_time = 0
@@ -25,68 +25,65 @@ class PomodoroTimer:
         # Initialize pyttsx3
         self.engine = pyttsx3.init()
 
-        # Custom Fonts
-        self.font_large = ("Segoe UI", 72)
-        self.font_medium = ("Segoe UI", 14)
-        self.font_small = ("Segoe UI", 12)
-
         # Task Label and Entry
-        self.task_label = tk.Label(root, text="Task:", font=self.font_medium, bg="#1E1E2E", fg="#F8F8F2")
+        self.task_label = tk.Label(root, text="Task:", font=("Segoe UI", 14), bg="#1E1E1E", fg="#FFFFFF")
         self.task_label.pack(pady=(20, 5))
-        self.task_entry = tk.Entry(root, width=50, font=self.font_medium, bg="#2E2E3E", fg="#F8F8F2", insertbackground="#F8F8F2", relief="flat")
-        self.task_entry.pack(pady=(0, 7))
+        self.task_entry = tk.Entry(root, width=30, font=("Segoe UI", 13), bg="#3C3C3C", fg="#FFFFFF", insertbackground="#FFFFFF")
+        self.task_entry.pack(pady=(0, 10))
 
         # Button to Set Task
-        self.set_task_button = tk.Button(root, text="Set Task", command=self.set_task, font=self.font_medium, bg="#6272A4", fg="#1E1E2E", relief="flat", bd=0, activebackground="#44475A", activeforeground="#F8F8F2")
-        self.set_task_button.pack(pady=(0, 7))
+        self.set_task_button = tk.Button(root, text="Set Task", command=self.set_task, font=("Segoe UI", 12), bg="#0078D4", fg="#FFFFFF", relief='flat', overrelief='ridge')
+        self.set_task_button.pack(pady=(0, 10))
 
         # Current Task Display
-        self.current_task_label = tk.Label(root, text="", font=self.font_medium, bg="#1E1E2E", fg="#F8F8F2")
-        self.current_task_label.pack(pady=(3, 3))
+        self.current_task_label = tk.Label(root, text="", font=("Segoe UI", 12), bg="#1E1E1E", fg="#FFFFFF")
+        self.current_task_label.pack(pady=(0, 7))
 
         # Timer Label
-        self.timer_label = tk.Label(root, text="25:00", font=self.font_large, bg="#1E1E2E", fg="#F8F8F2")
-        self.timer_label.pack(pady=10)   
+        self.timer_label = tk.Label(root, text="25:00", font=("Segoe UI", 65), bg="#1E1E1E", fg="#FFFFFF")
+        self.timer_label.pack(pady=5)
 
         # Control Buttons
-        self.button_frame = tk.Frame(root, bg="#1E1E2E")
+        self.button_frame = tk.Frame(root, bg="#1E1E1E")
         self.button_frame.pack(pady=10)
 
-        self.start_button = tk.Button(self.button_frame, text="Start", command=self.start_timer, font=self.font_medium, bg="#50FA7B", fg="#1E1E2E", width=10, relief="flat", bd=0, activebackground="#282A36", activeforeground="#F8F8F2")
+        button_style = {"font": ("Segoe UI", 12), "width": 10, "relief": "flat", "overrelief": "ridge"}
+
+        self.start_button = tk.Button(self.button_frame, text="Start", command=self.start_timer, bg="#0078D4", fg="#FFFFFF", **button_style)
         self.start_button.grid(row=0, column=0, padx=10)
-        self.pause_button = tk.Button(self.button_frame, text="Pause", command=self.pause_timer, font=self.font_medium, bg="#FFB86C", fg="#1E1E2E", width=10, relief="flat", bd=0, activebackground="#282A36", activeforeground="#F8F8F2")
+        self.pause_button = tk.Button(self.button_frame, text="Pause", command=self.pause_timer, bg="#EBCB8B", fg="#1E1E1E", **button_style)
         self.pause_button.grid(row=0, column=1, padx=10)
-        self.stop_button = tk.Button(self.button_frame, text="Stop", command=self.stop_timer, font=self.font_medium, bg="#FF5555", fg="#1E1E2E", width=10, relief="flat", bd=0, activebackground="#282A36", activeforeground="#F8F8F2")
+        self.stop_button = tk.Button(self.button_frame, text="Stop", command=self.stop_timer, bg="#BF616A", fg="#FFFFFF", **button_style)
         self.stop_button.grid(row=0, column=2, padx=10)
-        self.reset_button = tk.Button(self.button_frame, text="Reset", command=self.reset_timer, font=self.font_medium, bg="#BD93F9", fg="#1E1E2E", width=10, relief="flat", bd=0, activebackground="#282A36", activeforeground="#F8F8F2")
+        self.reset_button = tk.Button(self.button_frame, text="Reset", command=self.reset_timer, bg="#5E81AC", fg="#FFFFFF", **button_style)
         self.reset_button.grid(row=0, column=3, padx=10)
 
         # Music Selection Button
-        self.music_button = tk.Button(root, text="Select Music", command=self.load_music, font=self.font_medium, bg="#6272A4", fg="#1E1E2E", relief="flat", bd=0, activebackground="#44475A", activeforeground="#F8F8F2")
-        self.music_button.pack(pady=10)
+        self.music_button = tk.Button(root, text="Select Music", command=self.load_music, font=("Segoe UI", 12), bg="#800080", fg="#FFFFFF", relief='flat', overrelief='ridge')
+        self.music_button.pack(pady=15)
 
         # Custom Time Inputs
-        self.custom_time_frame = tk.Frame(root, bg="#1E1E2E")
+        self.custom_time_frame = tk.Frame(root, bg="#1E1E1E")
         self.custom_time_frame.pack(pady=5)
 
-        self.work_time_label = tk.Label(self.custom_time_frame, text="Work Duration (min):", font=self.font_small, bg="#1E1E2E", fg="#F8F8F2")
+        self.work_time_label = tk.Label(self.custom_time_frame, text="Work Duration (min):", font=("Segoe UI", 12), bg="#1E1E1E", fg="#FFFFFF")
         self.work_time_label.grid(row=0, column=0, padx=5)
-        self.work_time_entry = tk.Entry(self.custom_time_frame, width=5, font=self.font_small, bg="#2E2E3E", fg="#F8F8F2", insertbackground="#F8F8F2", relief="flat")
+        self.work_time_entry = tk.Entry(self.custom_time_frame, width=5, font=("Segoe UI", 12), bg="#3C3C3C", fg="#FFFFFF", insertbackground="#FFFFFF")
         self.work_time_entry.grid(row=0, column=1, padx=5)
         self.work_time_entry.insert(0, "25")
 
-        self.break_time_label = tk.Label(self.custom_time_frame, text="Break Duration (min):", font=self.font_small, bg="#1E1E2E", fg="#F8F8F2")
+        self.break_time_label = tk.Label(self.custom_time_frame, text="Break Duration (min):", font=("Segoe UI", 12), bg="#1E1E1E", fg="#FFFFFF")
         self.break_time_label.grid(row=0, column=2, padx=5)
-        self.break_time_entry = tk.Entry(self.custom_time_frame, width=5, font=self.font_small, bg="#2E2E3E", fg="#F8F8F2", insertbackground="#F8F8F2", relief="flat")
+        self.break_time_entry = tk.Entry(self.custom_time_frame, width=5, font=("Segoe UI", 12), bg="#3C3C3C", fg="#FFFFFF", insertbackground="#FFFFFF")
         self.break_time_entry.grid(row=0, column=3, padx=5)
         self.break_time_entry.insert(0, "5")
 
         # Statistics
-        self.stats_label = tk.Label(root, text="Pomodoros Completed: 0\nTotal Work Time: 0 mins\nTotal Break Time: 0 mins", font=self.font_small, bg="#1E1E2E", fg="#F8F8F2")
-        self.stats_label.pack(pady=10)
+        self.stats_label = tk.Label(root, text="Pomodoros Completed: 0\nTotal Work Time: 0 mins\nTotal Break Time: 0 mins", font=("Segoe UI", 12), bg="#1E1E1E", fg="#FFFFFF")
+        self.stats_label.pack(pady=15)
 
         # Custom Message Label
-        self.custom_message_label = tk.Label(root, text="Made with <3, by Rajat!", font=self.font_small, bg="#1E1E2E", fg="#F8F8F2")
+        self.custom_message_label = tk.Label(root, text="Made with <3, by Rajat", font=("Segoe UI", 8), bg="#1E1E1E", fg="#FFFFFF")
         self.custom_message_label.pack(pady=10)
 
         # Initial music file
@@ -130,6 +127,9 @@ class PomodoroTimer:
         self.current_task_label.config(text="")
         self.update_stats(0, 0, 0, 0, True)
 
+        #stops music after reset
+        self.stop_music()
+
     def countdown(self, count):
         mins, secs = divmod(count, 60)
         time_format = '{:02d}:{:02d}'.format(mins, secs)
@@ -143,35 +143,52 @@ class PomodoroTimer:
                 self.complete_task()
 
     def complete_task(self):
-        self.running = False
-        self.paused = False
         self.checkmark += 1
+        self.total_work_time += int(self.work_time_entry.get())
+        self.pomodoro_count += 1
+        self.engine.say(f"Task {self.task} completed. Take a break.")
+        self.engine.runAndWait()
+        notification.notify(
+            title="Pomodoro Timer",
+            message="Work session completed. Time for a break!",
+            timeout=5
+        )
+        self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count, 0)
+        self.start_break()
 
-        if self.checkmark % 2 != 0:
-            self.pomodoro_count += 1
-            self.total_work_time += int(self.work_time_entry.get())
-            self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count)
-            notification.notify(
-                title="Pomodoro Timer",
-                message="Time for a break!",
-                timeout=10
-            )
-            if self.music_file:
-                pygame.mixer.music.load(self.music_file)
-                pygame.mixer.music.play(loops=0)
-            self.root.after(1000, self.countdown, self.break_duration)
-        else:
-            self.total_break_time += int(self.break_time_entry.get())
-            self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count)
-            notification.notify(
-                title="Pomodoro Timer",
-                message="Break is over. Time to work!",
-                timeout=10
-            )
-            if self.music_file:
-                pygame.mixer.music.load(self.music_file)
-                pygame.mixer.music.play(loops=0)
-            self.root.after(1000, self.countdown, self.work_duration)
+    def start_break(self):
+        if self.music_file:
+            pygame.mixer.music.load(self.music_file)
+            pygame.mixer.music.play(loops=-1)
+
+        self.countdown_break(self.break_duration)
+
+    def countdown_break(self, count):
+        mins, secs = divmod(count, 60)
+        time_format = '{:02d}:{:02d}'.format(mins, secs)
+        self.timer_label.config(text=time_format)
+        self.remaining_time = count
+
+        if self.running:
+            if count > 0:
+                self.root.after(1000, self.countdown_break, count-1)
+            else:
+                self.end_break()
+
+    def end_break(self):
+        self.stop_music()
+        self.total_break_time += int(self.break_time_entry.get())
+        self.engine.say("Break is over. Start focusing.")
+        self.engine.runAndWait()
+        notification.notify(
+            title="Pomodoro Timer",
+            message="Break is over. Time to focus!",
+            timeout=5
+        )
+        self.update_stats(self.total_work_time, self.total_break_time, self.pomodoro_count, 0)
+        
+        self.running = False
+        self.start_timer()
 
     def stop_music(self):
         if pygame.mixer.music.get_busy():

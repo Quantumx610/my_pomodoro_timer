@@ -3,17 +3,14 @@ from tkinter import messagebox, filedialog
 from plyer import notification
 import pygame
 import pyttsx3
-
+import os
+import sys
 class PomodoroTimer:
     def __init__(self, root):
         self.root = root
         self.root.title("Pomodoro Timer")
         self.root.geometry("650x600")  # Increased window size for higher resolution
         self.root.config(bg="#1E1E2E")
-
-        #ICON
-        self.icon = tk.PhotoImage(file="logo.png")
-        self.root.iconphoto(False, self.icon)
 
         self.checkmark = 0
         self.total_work_time = 0

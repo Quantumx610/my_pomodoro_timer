@@ -15,7 +15,7 @@ The Pomodoro Timer is a productivity tool that helps you manage your work sessio
 
 ## Screenshots
 
-![Pomodoro Timer Screenshot](image.png)
+![Pomodoro Timer Screenshot](image1.png)
 
 ## Installation
 

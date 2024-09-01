@@ -13,8 +13,6 @@ The Pomodoro Timer is a productivity tool that helps you manage your work sessio
 - **Voice Notifications**: Voice alerts to notify you when tasks and breaks start and end.
 - **Customizable Timing**: Adjustable work and break durations.
 
-![alt text](image1.PNG)
-
 
 ## Installation
 
